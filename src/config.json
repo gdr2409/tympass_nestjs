@@ -1,0 +1,12 @@
+{
+	"pgConfig": {
+		"host": "localhost",
+		"port": 5434,
+		"database": "tympass",
+		"username": "superadmin",
+		"password": "tympass",
+		"name": "postgres",
+		"debug": true,
+		"poolSize": 20
+	  }
+}

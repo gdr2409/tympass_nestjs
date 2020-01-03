@@ -4,6 +4,9 @@ import { IsString, MaxLength, IsOptional } from 'class-validator';
 @ObjectType()
 export class UserEntityGQL {
 	@Field()
+	id: number;
+
+	@Field()
 	@IsString()
 	name: string;
 

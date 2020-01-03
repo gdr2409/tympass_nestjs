@@ -1,8 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserData } from './user.entity';
 import { Repository, getManager } from "typeorm";
 import { UserSignUpInput } from './GraphqlEntites/user.signup.input';
+import { UserLoginByUsername, UserLoginByPhone } from "./GraphqlEntites/user.login.input";
 
 @Injectable()
 export class UserService {
@@ -44,5 +45,52 @@ export class UserService {
 		await this.userRespository.save(userToCreate);
 
 		return await this.userRespository.findOne({ username: signUpData.username });
+	}
+
+	async checkUserLoginByUsername(userLoginDto: UserLoginByUsername): Promise<UserData> {
+
+		const requiredUser = await this.userRespository.findOne({ username: userLoginDto.username });
+		
+		if (!requiredUser) {
+			throw new Error('Invalid user name');
+		}
+
+		if (requiredUser.password !== userLoginDto.password) {
+			throw new Error('Invalid password');
+		}
+
+		//Update auth token here
+		requiredUser.is_active = true;
+		await this.userRespository.save(requiredUser);
+		return requiredUser;
+	}
+
+	async checkUserLoginByPhone(userLoginDto: UserLoginByPhone): Promise<UserData> {
+
+		const requiredUser = await this.userRespository.findOne({ phone: userLoginDto.phone });
+		
+		if (!requiredUser) {
+			throw new Error('Invalid phone');
+		}
+
+		if (requiredUser.password !== userLoginDto.password) {
+			throw new Error('Invalid password');
+		}
+
+		//Update auth token here
+		requiredUser.is_active = true;
+		await this.userRespository.save(requiredUser);
+		return requiredUser;
+	}
+
+	async validateUserForUserDetails(currentUserId: number, requestedUsername: string): Promise<boolean> {
+		const currentUser = await this.userRespository.findOne({ id: currentUserId });
+		const requiredUser = await this.userRespository.findOne({ username: requestedUsername });
+
+		if (currentUser.id !== requiredUser.id) {
+			return false;
+		}
+
+		return true;
 	}
 }

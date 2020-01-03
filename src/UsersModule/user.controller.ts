@@ -1,19 +1,12 @@
-import { Controller, Get, Post, Param, Req, Res, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Req, Res, Body, UsePipes } from '@nestjs/common';
 import { UserService } from './user.service';
-
+import { UserLoginValidator } from './dto/user.login.validator';
+import { UserLoginDto } from './dto/user.login.dto';
 @Controller('User')
 export class UserController {
 	constructor(
 		private readonly userService: UserService
 	) {}
-
-	// @Get(':id')
-	// async getDetails(@Param('id') id): Promise<any> {
-
-	// 	return {
-	// 		status: 'OK'
-	// 	};
-	// }
 
 	@Post('create')
 	async createNewUser(@Body() params): Promise<any> {

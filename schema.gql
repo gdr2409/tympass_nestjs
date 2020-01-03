@@ -4,19 +4,33 @@
 # -----------------------------------------------
 
 type Mutation {
-  userSignUp(signUpData: UserSignUpInput!): UserEntityGQL!
+  UserLoginByUsername(loginData: UserLoginByUsername!): UserEntityGQL!
+  UserLoginByPhone(loginData: UserLoginByPhone!): UserEntityGQL!
+  UserSignUp(signUpData: UserSignUpInput!): UserEntityGQL!
 }
 
 type Query {
-  userdata(username: String!): UserEntityGQL!
+  GetAllUsers: [UserEntityGQL!]!
+  Userdata(username: String!): UserEntityGQL!
 }
 
 type UserEntityGQL {
+  id: Float!
   name: String!
   username: String!
   phone: String!
   fcm_token: String
   is_active: Boolean!
+}
+
+input UserLoginByPhone {
+  phone: String!
+  password: String!
+}
+
+input UserLoginByUsername {
+  username: String!
+  password: String!
 }
 
 input UserSignUpInput {

@@ -9,6 +9,7 @@ import { UserData } from './UsersModule/user.entity';
 import { UserService } from './UsersModule/user.service';
 import { UserModule } from './UsersModule/user.module';
 import { GraphQLModule } from '@nestjs/graphql';
+import { Neo4jModule } from './Neo4j/neo4j.module';
 
 @Module({
   imports: [TypeOrmModule.forRootAsync({
@@ -26,9 +27,11 @@ import { GraphQLModule } from '@nestjs/graphql';
 		inject: [ConfigService]
 	}),
 	GraphQLModule.forRoot({
-		autoSchemaFile: 'schema.gql'
+		autoSchemaFile: 'schema.gql',
+		context: ({ req, res }) => ({ req, res })
 	}),
-	UserModule
+	UserModule,
+	Neo4jModule
   ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService]

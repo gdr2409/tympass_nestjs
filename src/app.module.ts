@@ -10,6 +10,7 @@ import { UserService } from './UsersModule/user.service';
 import { UserModule } from './UsersModule/user.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Neo4jModule } from './Neo4j/neo4j.module';
+import { UserGroupModule } from './UserGroupModule/user.group.module';
 
 @Module({
   imports: [TypeOrmModule.forRootAsync({
@@ -30,6 +31,7 @@ import { Neo4jModule } from './Neo4j/neo4j.module';
 		autoSchemaFile: 'schema.gql',
 		context: ({ req, res }) => ({ req, res })
 	}),
+	UserGroupModule,
 	UserModule,
 	Neo4jModule
   ],

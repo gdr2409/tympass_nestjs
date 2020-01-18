@@ -22,7 +22,7 @@ export class Neo4jService {
 		});
     }
 
-	async executeQuery(query: string, params: any | undefined) {
+	async executeQuery(query: string, params?: any) {
 
 		if (!params) {
 			return await this.cipher(query);

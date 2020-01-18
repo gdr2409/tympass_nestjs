@@ -6,7 +6,10 @@ import { UserLoginByPhone, UserLoginByUsername } from './GraphqlEntites/user.log
 import { UseGuards } from '@nestjs/common';
 import { AuthenticateUser } from './../AuthenticationModule/user.authenticate';
 import { UserNeo4jService } from './user.neo4j.service';
-@Resolver(of => UserEntityGQL)
+import { UserLoginOutput } from './GraphqlEntites/user.login.output';
+import { GetUserData } from './GraphqlEntites/user.data.query';
+
+@Resolver()
 export class UserResolver {
 	constructor(private readonly userService: UserService,
 		private readonly userServiceNeo4j: UserNeo4jService) {}
@@ -18,10 +21,10 @@ export class UserResolver {
 	}
 
 	@UseGuards(AuthenticateUser)
-	@Query(returns => UserEntityGQL, { name: 'Userdata' })
-	async getUserData(@Args('username') username: string, @Context() context) {
+	@Query(returns => [UserEntityGQL], { name: 'Userdata' })
+	async getUserData(@Args() { username, name, phone }: GetUserData) {
 
-	  const result = await this.userServiceNeo4j.findOneByUsername(username);
+	  const result = await this.userServiceNeo4j.findUser(username, name, phone);
 
 	  if (!result) {
 		  throw new Error('Not found');
@@ -30,14 +33,14 @@ export class UserResolver {
 	  return result;
 	}
 
-	@Mutation(returns => UserEntityGQL, { name: 'UserLoginByUsername' })
+	@Mutation(returns => UserLoginOutput, { name: 'UserLoginByUsername' })
 	async userLoginByUsername(@Args('loginData') loginData: UserLoginByUsername) {
-		return await this.userService.checkUserLoginByUsername(loginData);
+		return await this.userServiceNeo4j.checkUserLoginByUsername(loginData);
 	}
 
-	@Mutation(returns => UserEntityGQL, { name: 'UserLoginByPhone' })
+	@Mutation(returns => UserLoginOutput, { name: 'UserLoginByPhone' })
 	async userLoginByPhone(@Args('loginData') loginData: UserLoginByPhone) {
-		return await this.userService.checkUserLoginByPhone(loginData);
+		return await this.userServiceNeo4j.checkUserLoginByPhone(loginData);
 	}
 
 	@Mutation(returns => UserEntityGQL, { name: 'UserSignUp'})

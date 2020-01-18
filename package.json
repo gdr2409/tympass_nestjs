@@ -43,7 +43,12 @@
     "rxjs": "^6.5.3",
     "tsc": "^1.20150623.0",
     "type-graphql": "^0.17.6",
-    "typeorm": "^0.2.22"
+    "typeorm": "^0.2.22",
+    "uuid": "^3.3.3",
+    "request": "^2.34",
+    "moment": "^2.13.0",
+    "graphql-tag-pluck": "^0.8.3"
+
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",

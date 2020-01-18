@@ -1,19 +1,23 @@
 import { ObjectType, Field } from "type-graphql";
+import { UserEntityGQL } from '../../UsersModule/GraphqlEntites/user.entity.gql'
 
 @ObjectType()
-export class GroupOverview {
+export class GroupDetails {
 	@Field()
 	id: number;
 
-	@Field({ nullable: true })
+	@Field()
 	group_name: string;
 
-	@Field({ nullable: true })
+	@Field()
 	number_of_participants: number;
 
 	@Field({ nullable: true })
 	created_by: string;
 
-	@Field({ nullable: true })
+	@Field()
 	max_participants: number;
+
+	@Field(type => [UserEntityGQL])
+	users: UserEntityGQL[];
 }

@@ -8,26 +8,44 @@ input CreateGroupInput {
   max_participants: Float!
 }
 
+input EditGroupInput {
+  group_name: String
+  max_participants: Float
+}
+
 type GroupDetails {
   id: Float!
   group_name: String!
   number_of_participants: Float!
-  created_by: String!
+  created_by: String
   max_participants: Float!
+  users: [UserEntityGQL!]!
+}
+
+type GroupOverview {
+  id: Float!
+  group_name: String
+  number_of_participants: Float
+  created_by: String
+  max_participants: Float
 }
 
 type Mutation {
   UserLoginByUsername(loginData: UserLoginByUsername!): UserLoginOutput!
   UserLoginByPhone(loginData: UserLoginByPhone!): UserLoginOutput!
   UserSignUp(signUpData: UserSignUpInput!): UserEntityGQL!
-  CreateNewGroup(newGroupData: CreateGroupInput!): GroupDetails!
-  EditGroup(editGroupData: CreateGroupInput!): GroupDetails!
+  CreateNewGroup(newGroupData: CreateGroupInput!): GroupOverview!
+  EditGroup(editGroupData: EditGroupInput!): GroupOverview!
+  AddUserToGroup(userId: Float!): GroupDetails!
+  LeaveGroup(groupId: Float!): GroupOverview!
+  DeleteGroup(groupId: Float!): GroupOverview!
 }
 
 type Query {
   GetAllUsers: [UserEntityGQL!]!
   Userdata(username: String, name: String, phone: String): [UserEntityGQL!]!
-  GetAllGroups(userId: Float!): [GroupDetails!]!
+  GetAllGroups(userId: Float!): [GroupOverview!]!
+  GetGroupDetail(groupId: Float!): GroupDetails!
 }
 
 type UserEntityGQL {

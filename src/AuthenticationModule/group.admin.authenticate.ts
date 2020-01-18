@@ -13,6 +13,7 @@ export class AuthenticateGroupAdmin implements CanActivate {
 		const ctx = GqlExecutionContext.create(context);
 		const req = ctx.getContext().req;
 		const userId = req.headers['user-id'];
+		const groupId = req.headers['group-id'];
 
 		if (!userId) {
 			throw new BadRequestException('User Id should be present');
@@ -27,7 +28,7 @@ export class AuthenticateGroupAdmin implements CanActivate {
 			RETURN r`,
 			{
 				userId: parseInt(userId),
-				groupId: ''
+				groupId: parseInt(groupId)
 			}
 		);
 

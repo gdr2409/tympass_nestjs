@@ -11,6 +11,7 @@ interface User {
 	name: string;
 	phone: string;
 };
+
 @Injectable()
 export class UserNeo4jService {
 	constructor(

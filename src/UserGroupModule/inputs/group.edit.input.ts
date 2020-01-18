@@ -2,11 +2,11 @@ import { InputType, Field } from 'type-graphql';
 import { Max } from 'class-validator';
 
 @InputType()
-export class CreateGroupInput {
-	@Field()
+export class EditGroupInput {
+	@Field({ nullable: true })
 	group_name: string
 
-	@Field()
+	@Field({ nullable: true })
 	@Max(25)
 	max_participants: number
 }

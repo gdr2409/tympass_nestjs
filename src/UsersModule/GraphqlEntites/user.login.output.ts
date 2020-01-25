@@ -4,21 +4,21 @@ import { IsString, MaxLength, IsOptional } from 'class-validator';
 @ObjectType()
 export class UserLoginOutput {
 	@Field()
-	id: number;
+	public id: number;
 
 	@Field()
-	name: string;
+	public name: string;
 
 	@Field()
-	username: string;
+	public username: string;
 
 	@Field()
 	@MaxLength(10)
-	phone: string
+	public phone: string;
 
 	@Field({ nullable: true })
-	fcm_token: string
+	public fcm_token: string;
 
 	@Field()
-	auth_token: string
+	public auth_token: string;
 }

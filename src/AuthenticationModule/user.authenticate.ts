@@ -1,5 +1,5 @@
-import { CanActivate, Injectable, ExecutionContext, Inject, UnauthorizedException, BadRequestException } from "@nestjs/common";
-import { GqlExecutionContext } from "@nestjs/graphql";
+import { CanActivate, Injectable, ExecutionContext, Inject, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { Neo4jService } from '../Neo4j/neo4j.service';
 
 const assert = require('assert');
@@ -8,10 +8,10 @@ const moment = require('moment');
 export class AuthenticateUser implements CanActivate {
 	constructor(
 		@Inject(Neo4jService)
-		private readonly neo4j: Neo4jService
+		private readonly neo4j: Neo4jService,
 	) {}
 
-	async canActivate(context: ExecutionContext): Promise<boolean> {
+	public async canActivate(context: ExecutionContext): Promise<boolean> {
 		const ctx = GqlExecutionContext.create(context);
 		const req = ctx.getContext().req;
 		const userId = req.headers['user-id'];
@@ -35,7 +35,7 @@ export class AuthenticateUser implements CanActivate {
 				WHERE authToken.token = $authToken
 				AND authToken.user_id = $userId
 				AND authToken.expiry_at >= datetime().epochMillis
-			RETURN authToken`, { authToken, userId: parseInt(userId) }
+			RETURN authToken`, { authToken, userId: parseInt(userId) },
 		);
 
 		if (!result.length) {

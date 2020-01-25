@@ -7,10 +7,10 @@ const uuid = require('uuid/v4');
 export class AuthTokenService {
 	constructor(
 		@Inject(Neo4jService)
-		private readonly neo4j: Neo4jService
+		private readonly neo4j: Neo4jService,
 	) {}
 
-	async createNewToken(userId: string): Promise<any> {
+	public async createNewToken(userId: string): Promise<any> {
 		const authToken = uuid();
 		await this.neo4j.executeQuery(
 			`CREATE (n: AuthToken {
@@ -25,8 +25,8 @@ export class AuthTokenService {
 			RETURN n`,
 			{
 				userId,
-				authToken
-			} 
+				authToken,
+			},
 		);
 
 		return authToken;

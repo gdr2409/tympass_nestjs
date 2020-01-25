@@ -2,11 +2,11 @@ import { ArgsType, Field } from 'type-graphql';
 @ArgsType()
 export class GetUserData {
   @Field({ nullable: true })
-  username?: string;
+  public username?: string;
 
   @Field({ nullable: true })
-  name?: string;
+  public name?: string;
 
   @Field({ nullable: true })
-  phone?: string;
+  public phone?: string;
 }

@@ -4,26 +4,26 @@ import { IsString, MaxLength, IsOptional } from 'class-validator';
 @ObjectType()
 export class UserEntityGQL {
 	@Field()
-	id: number;
+	public id: number;
 
 	@Field()
 	@IsString()
-	name: string;
+	public name: string;
 
 	@Field()
 	@IsString()
-	username: string;
+	public username: string;
 
 	@Field()
 	@IsString()
 	@MaxLength(10)
-	phone: string
+	public phone: string;
 
 	@Field({ nullable: true })
 	@IsOptional()
 	@IsString()
-	fcm_token: string
+	public fcm_token: string;
 
 	@Field()
-	is_active: boolean
+	public is_active: boolean;
 }

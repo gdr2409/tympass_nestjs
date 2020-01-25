@@ -1,33 +1,33 @@
-import { Injectable, Inject } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable, Inject } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { UserData } from './user.entity';
-import { Repository, getManager } from "typeorm";
+import { Repository, getManager } from 'typeorm';
 import { UserSignUpInput } from './GraphqlEntites/user.signup.input';
-import { UserLoginByUsername, UserLoginByPhone } from "./GraphqlEntites/user.login.input";
+import { UserLoginByUsername, UserLoginByPhone } from './GraphqlEntites/user.login.input';
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(UserData)
-		private readonly userRespository: Repository<UserData>
+		private readonly userRespository: Repository<UserData>,
 	) {}
 
-	async getAllUsers(): Promise<UserData[]> {
+	public async getAllUsers(): Promise<UserData[]> {
 		return this.userRespository.find();
 	}
 
-	async findOneByUsername(username: string): Promise<UserData> {
+	public async findOneByUsername(username: string): Promise<UserData> {
 
 		const manager = getManager();
 		const result = await this.userRespository.query('SELECT * FROM user_data WHERE username = $1', [username]);
-		//const result = await this.userRespository.findOne({ username: username });
+		// const result = await this.userRespository.findOne({ username: username });
 		if (!result.length) {
 			return null;
 		}
 		return result[0];
 	}
 
-	async createNewUser(signUpData: UserSignUpInput): Promise<UserData> {
+	public async createNewUser(signUpData: UserSignUpInput): Promise<UserData> {
 
 		const requiredUser = await this.userRespository.findOne({ username: signUpData.username });
 
@@ -39,7 +39,7 @@ export class UserService {
 			username: signUpData.username,
 			password: signUpData.password,
 			name: signUpData.name,
-			phone: signUpData.phone
+			phone: signUpData.phone,
 		};
 
 		await this.userRespository.save(userToCreate);
@@ -47,10 +47,10 @@ export class UserService {
 		return await this.userRespository.findOne({ username: signUpData.username });
 	}
 
-	async checkUserLoginByUsername(userLoginDto: UserLoginByUsername): Promise<UserData> {
+	public async checkUserLoginByUsername(userLoginDto: UserLoginByUsername): Promise<UserData> {
 
 		const requiredUser = await this.userRespository.findOne({ username: userLoginDto.username });
-		
+
 		if (!requiredUser) {
 			throw new Error('Invalid user name');
 		}
@@ -59,16 +59,16 @@ export class UserService {
 			throw new Error('Invalid password');
 		}
 
-		//Update auth token here
+		// Update auth token here
 		requiredUser.is_active = true;
 		await this.userRespository.save(requiredUser);
 		return requiredUser;
 	}
 
-	async checkUserLoginByPhone(userLoginDto: UserLoginByPhone): Promise<UserData> {
+	public async checkUserLoginByPhone(userLoginDto: UserLoginByPhone): Promise<UserData> {
 
 		const requiredUser = await this.userRespository.findOne({ phone: userLoginDto.phone });
-		
+
 		if (!requiredUser) {
 			throw new Error('Invalid phone');
 		}
@@ -77,13 +77,13 @@ export class UserService {
 			throw new Error('Invalid password');
 		}
 
-		//Update auth token here
+		// Update auth token here
 		requiredUser.is_active = true;
 		await this.userRespository.save(requiredUser);
 		return requiredUser;
 	}
 
-	async validateUserForUserDetails(currentUserId: number, requestedUsername: string): Promise<boolean> {
+	public async validateUserForUserDetails(currentUserId: number, requestedUsername: string): Promise<boolean> {
 		const currentUser = await this.userRespository.findOne({ id: currentUserId });
 		const requiredUser = await this.userRespository.findOne({ username: requestedUsername });
 

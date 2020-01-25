@@ -4,18 +4,18 @@ import { MaxLength } from 'class-validator';
 @InputType()
 export class UserSignUpInput {
 	@Field()
-	name: string;
+	public name: string;
 
 	@Field()
-	username: string;
+	public username: string;
 
 	@Field()
-	password: string;
+	public password: string;
 
 	@Field()
 	@MaxLength(10)
-	phone: string;
+	public phone: string;
 
 	@Field({ nullable: true })
-	fcm_token: string
+	public fcm_token: string;
 }

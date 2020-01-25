@@ -7,56 +7,56 @@ import { UserNeo4jService } from '../UsersModule/user.neo4j.service';
 @Injectable()
 export class UserGroupService {
 
-	constructor (
+	constructor(
 		@Inject(Neo4jService)
 		private readonly neo4j: Neo4jService,
 		@Inject(UserNeo4jService)
-		private readonly userService: UserNeo4jService
+		private readonly userService: UserNeo4jService,
 	) {}
 
-	groupProperties(requiredGroup: any): object {
+	public groupProperties(requiredGroup: any): object {
 		return {
 			id: requiredGroup.identity.toNumber(),
 			group_name: requiredGroup.properties.group_name,
-			max_participants: requiredGroup.properties.max_participants
+			max_participants: requiredGroup.properties.max_participants,
 		};
 	}
 
-	userProperties (requiredUser: any): any {
+	public userProperties(requiredUser: any): any {
 		return {
 			id: requiredUser.identity.toNumber(),
 			username: requiredUser.properties.username,
 			phone: requiredUser.properties.phone,
-			name: requiredUser.properties.name
+			name: requiredUser.properties.name,
 		};
 	}
 
-	async getAllGroups(userId: number): Promise<any> {
+	public async getAllGroups(userId: number): Promise<any> {
 		const queryResult = await this.neo4j.executeQuery(`
 			MATCH (user: User)
 				WHERE id(user) = $userId
 			MATCH (user:User)-[r:IN_GROUP]-(groups:GROUP)
 			RETURN groups`,
-			{ userId }
+			{ userId },
 		);
 
-		return queryResult.map(record => {
+		return queryResult.map((record) => {
 			const field = record._fields[0];
 			return {
 				id: field.identity.low,
-				...field.properties
-			}
+				...field.properties,
+			};
 		});
 	}
 
-	async checkIfGroupExists(groupName: string): Promise<boolean> {
+	public async checkIfGroupExists(groupName: string): Promise<boolean> {
 		const queryResult = await this.neo4j.executeQuery(`
 			MATCH (g: Group)
 				WHERE g.group_name = $groupName
 			RETURN g`,
 			{
-				groupName: groupName.toLowerCase()
-			}
+				groupName: groupName.toLowerCase(),
+			},
 		);
 
 		if (queryResult.length) {
@@ -65,7 +65,7 @@ export class UserGroupService {
 		return false;
 	}
 
-	async createNewGroup(groupData: CreateGroupInput, createdBy: string): Promise<any> {
+	public async createNewGroup(groupData: CreateGroupInput, createdBy: string): Promise<any> {
 
 		const checkDuplicateGroupName = await this.checkIfGroupExists(groupData.group_name);
 
@@ -86,18 +86,18 @@ export class UserGroupService {
 			CREATE (user)-[r1:JOINED]->(n)
 			CREATE (user)-[r2:GROUP_ADMIN]->(n)
 			RETURN n`,
-			{ 
+			{
 				groupName: groupData.group_name.toLowerCase(),
 				maxParticipants: groupData.max_participants,
-				userId: parseInt(createdBy)
-			}
+				userId: parseInt(createdBy),
+			},
 		);
 
 		const userQueryResult = await this.neo4j.executeQuery(`
 			MATCH (n: User)
 				WHERE id(n) = $userId
 			RETURN n`,
-			{ userId: parseInt(createdBy) }
+			{ userId: parseInt(createdBy) },
 		);
 
 		const requiredGroup = groupQueryResult[0]._fields[0];
@@ -106,11 +106,11 @@ export class UserGroupService {
 		return {
 			...this.groupProperties(requiredGroup),
 			created_by: requiredUser.properties.username,
-			number_of_participants: 1
+			number_of_participants: 1,
 		};
 	}
 
-	async checkIfAlreadyAdded(userId: number, groupId: number): Promise<boolean> {
+	public async checkIfAlreadyAdded(userId: number, groupId: number): Promise<boolean> {
 
 		const queryResult = await this.neo4j.executeQuery(
 			`MATCH (u: User)-[r:JOINED]-(g: Group)
@@ -119,8 +119,8 @@ export class UserGroupService {
 			`,
 			{
 				userId,
-				groupId
-			}
+				groupId,
+			},
 		);
 
 		if (queryResult.length) {
@@ -130,7 +130,7 @@ export class UserGroupService {
 		return false;
 	}
 
-	async addUserToGroup (userId: number, groupId: number): Promise<any> {
+	public async addUserToGroup(userId: number, groupId: number): Promise<any> {
 
 		const checkIfAlreadyAdded = await this.checkIfAlreadyAdded(userId, groupId);
 
@@ -153,8 +153,8 @@ export class UserGroupService {
 			query,
 			{
 				userId,
-				groupId
-			}
+				groupId,
+			},
 		);
 
 		const requiredGroup = queryResult[0]._fields[0];
@@ -164,13 +164,13 @@ export class UserGroupService {
 		return {
 			...this.groupProperties(requiredGroup),
 			number_of_participants: numParticipants,
-			users: requiredUsers.map(elem => {
+			users: requiredUsers.map((elem) => {
 				return this.userService.userProperties(elem);
-			})
+			}),
 		};
 	}
 
-	async editGroup(groupData: EditGroupInput, groupId: number): Promise<any> {
+	public async editGroup(groupData: EditGroupInput, groupId: number): Promise<any> {
 
 		const alias: string = 'group';
 		const queryParams: any = { groupId };
@@ -198,7 +198,7 @@ export class UserGroupService {
 
 		const queryResult = await this.neo4j.executeQuery(
 			query,
-			queryParams
+			queryParams,
 		);
 
 		if (!queryResult.length) {
@@ -209,7 +209,7 @@ export class UserGroupService {
 		return this.groupProperties(requiredGroup);
 	}
 
-	async leaveGroup(userId: number, groupId: number): Promise<any> {
+	public async leaveGroup(userId: number, groupId: number): Promise<any> {
 
 		const adminQueryResult = await this.neo4j.executeQuery(`
 			MATCH (n: User)-[r:GROUP_ADMIN]-(g: Group)
@@ -218,8 +218,8 @@ export class UserGroupService {
 			`,
 			{
 				userId,
-				groupId
-			}
+				groupId,
+			},
 		);
 
 		if (adminQueryResult.length) {
@@ -234,14 +234,14 @@ export class UserGroupService {
 			`,
 			{
 				userId,
-				groupId
-			}
+				groupId,
+			},
 		);
-		
+
 		return { id: groupId };
 	}
 
-	async getGroupDetails(groupId: number):Promise<any> {
+	public async getGroupDetails(groupId: number): Promise<any> {
 		const queryResult = await this.neo4j.executeQuery(`
 			MATCH (g: Group)
 				WHERE id(g) = $groupId
@@ -254,8 +254,8 @@ export class UserGroupService {
 				collect(DISTINCT n) as participants
 			`,
 			{
-				groupId
-			}
+				groupId,
+			},
 		);
 
 		if (!queryResult.length) {
@@ -269,13 +269,13 @@ export class UserGroupService {
 			...this.groupProperties(requiredGroup),
 			created_by: queryResult[0]._fields[1],
 			number_of_participants: queryResult[0]._fields[2].toNumber(),
-			users: requiredUsers.map(elem => {
+			users: requiredUsers.map((elem) => {
 				return this.userService.userProperties(elem);
-			})
-		}
+			}),
+		};
 	}
 
-	async deleteGroup(groupId: number) {
+	public async deleteGroup(groupId: number) {
 
 		// TODO take care of deletion when group is linked to some poll
 		const queryResult = await this.neo4j.executeQuery(`
@@ -284,8 +284,8 @@ export class UserGroupService {
 			DETACH DELETE r
 			`,
 			{
-				groupId
-			}
+				groupId,
+			},
 		);
 
 		return { id: groupId };

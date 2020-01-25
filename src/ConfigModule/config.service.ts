@@ -1,37 +1,37 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ConfigService {
 
-	pgConfig = {
+	public pgConfig = {
 		host: 'localhost',
 		port: 5434,
 		username: 'superadmin',
 		password: 'tympass',
-		database: 'template1'
+		database: 'template1',
 	};
 
-	getPostgresConfig(): any {
+	public getPostgresConfig(): any {
 		return this.pgConfig;
 	}
 
-	getHost(): string {
+	public getHost(): string {
 		return this.pgConfig.host || 'localhost';
 	}
 
-	getPort(): number {
+	public getPort(): number {
 		return this.pgConfig.port || 5434;
 	}
 
-	getUsername(): string {
+	public getUsername(): string {
 		return this.pgConfig.username || 'superadmin';
 	}
 
-	getPassword(): string {
+	public getPassword(): string {
 		return this.pgConfig.password || 'tympass';
 	}
 
-	getDatabase(): string {
+	public getDatabase(): string {
 		return this.pgConfig.database || 'tympass';
 	}
 }

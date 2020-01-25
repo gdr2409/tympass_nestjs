@@ -4,7 +4,7 @@ import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UserLoginValidator implements PipeTransform<any> {
-	async transform(value, metadata: ArgumentMetadata) {
+	public async transform(value, metadata: ArgumentMetadata) {
 		const { metatype } = metadata;
 		if (!metatype) {
 			return value;

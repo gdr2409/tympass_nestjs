@@ -4,18 +4,19 @@ import { MaxLength } from 'class-validator';
 @InputType()
 export class UserLoginByUsername {
 	@Field()
-	username: string;
+	public username: string;
 
 	@Field()
-	password: string;
+	public password: string;
 }
 
+// tslint:disable-next-line: max-classes-per-file
 @InputType()
 export class UserLoginByPhone {
 	@Field()
 	@MaxLength(10)
-	phone: string;
+	public phone: string;
 
 	@Field()
-	password: string;
+	public password: string;
 }

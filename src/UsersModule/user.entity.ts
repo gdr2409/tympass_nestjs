@@ -1,28 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class UserData {
 	@PrimaryGeneratedColumn()
-	id: number
+	public id: number;
 
 	@Column()
-	name: string;
+	public name: string;
 
 	@Column()
-	username: string;
+	public username: string;
 
 	@Column({ length: 10 })
-	phone: string;
+	public phone: string;
 
 	@Column()
-	password: string;
+	public password: string;
 
 	@Column({ default: true })
-	is_active: boolean;
+	public is_active: boolean;
 
 	@Column({ nullable: true })
-	fcm_token: string;
+	public fcm_token: string;
 
 	@Column('timestamptz', { nullable: true })
-	fcm_update_time: Date;
+	public fcm_update_time: Date;
 }

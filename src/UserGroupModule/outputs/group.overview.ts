@@ -1,19 +1,19 @@
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field } from 'type-graphql';
 
 @ObjectType()
 export class GroupOverview {
 	@Field()
-	id: number;
+	public id: number;
 
 	@Field({ nullable: true })
-	group_name: string;
+	public group_name: string;
 
 	@Field({ nullable: true })
-	number_of_participants: number;
+	public number_of_participants: number;
 
 	@Field({ nullable: true })
-	created_by: string;
+	public created_by: string;
 
 	@Field({ nullable: true })
-	max_participants: number;
+	public max_participants: number;
 }

@@ -5,23 +5,23 @@ import { UserLoginDto } from './dto/user.login.dto';
 @Controller('User')
 export class UserController {
 	constructor(
-		private readonly userService: UserService
+		private readonly userService: UserService,
 	) {}
 
 	@Post('create')
-	async createNewUser(@Body() params): Promise<any> {
+	public async createNewUser(@Body() params): Promise<any> {
 		await this.userService.createNewUser(params);
 		return {
 			status: 'OK',
-			data: await this.userService.getAllUsers()
+			data: await this.userService.getAllUsers(),
 		};
 	}
 
 	@Get('getAll')
-	async getAllUsersData(@Req() req): Promise<any> {
+	public async getAllUsersData(@Req() req): Promise<any> {
 		try {
 			const toRet: any = {
-				status: 'OK'
+				status: 'OK',
 			};
 
 			toRet.data = await this.userService.getAllUsers();
@@ -29,6 +29,6 @@ export class UserController {
 		} catch (err) {
 			return { message: 'Error' };
 		}
-		
+
 	}
 }

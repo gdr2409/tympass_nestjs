@@ -23,19 +23,19 @@ import { UserGroupModule } from './UserGroupModule/user.group.module';
 			password: configService.getPassword(),
 			username: configService.getUsername(),
 			entities: [UserData],
-			synchronize: true
+			synchronize: true,
 		}),
-		inject: [ConfigService]
+		inject: [ConfigService],
 	}),
 	GraphQLModule.forRoot({
 		autoSchemaFile: 'schema.gql',
-		context: ({ req, res }) => ({ req, res })
+		context: ({ req, res }) => ({ req, res }),
 	}),
 	UserGroupModule,
 	UserModule,
-	Neo4jModule
+	Neo4jModule,
   ],
   controllers: [AppController, UserController],
-  providers: [AppService, UserService]
+  providers: [AppService, UserService],
 })
 export class AppModule {}

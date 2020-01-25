@@ -9,22 +9,21 @@ import { EditGroupInput } from './inputs/group.edit.input';
 import { AuthenticateUser } from '../AuthenticationModule/user.authenticate';
 import { AuthenticateGroupAdmin } from '../AuthenticationModule/group.admin.authenticate';
 
-
 @Resolver ()
 export class GroupDetailsResolver {
 	constructor(
-		private readonly groupService: UserGroupService
+		private readonly groupService: UserGroupService,
 	) {}
 
 	@UseGuards(AuthenticateUser)
-	@Query(returns => [GroupOverview], { name: 'GetAllGroups' })
-	async getAllGroups(@Args('userId') userId: number) {
+	@Query((returns) => [GroupOverview], { name: 'GetAllGroups' })
+	public async getAllGroups(@Args('userId') userId: number) {
 		return await this.groupService.getAllGroups(userId);
 	}
 
 	@UseGuards(AuthenticateUser)
-	@Mutation(returns => GroupOverview, { name: 'CreateNewGroup'})
-	async createNewGroup(@Args('newGroupData') groupData: CreateGroupInput, @Context() context) {
+	@Mutation((returns) => GroupOverview, { name: 'CreateNewGroup'})
+	public async createNewGroup(@Args('newGroupData') groupData: CreateGroupInput, @Context() context) {
 		const userId = context.req.headers['user-id'];
 		const requiredGroup = await this.groupService.createNewGroup(groupData, userId);
 
@@ -37,8 +36,8 @@ export class GroupDetailsResolver {
 
 	@UseGuards(AuthenticateUser)
 	@UseGuards(AuthenticateGroupAdmin)
-	@Mutation(returns => GroupOverview, { name: 'EditGroup'})
-	async editGroup(@Args('editGroupData') groupData: EditGroupInput, @Context() context) {
+	@Mutation((returns) => GroupOverview, { name: 'EditGroup'})
+	public async editGroup(@Args('editGroupData') groupData: EditGroupInput, @Context() context) {
 		const groupId = context.req.headers['group-id'];
 		const requiredGroup = await this.groupService.editGroup(groupData, parseInt(groupId));
 
@@ -51,8 +50,8 @@ export class GroupDetailsResolver {
 
 	@UseGuards(AuthenticateUser)
 	@UseGuards(AuthenticateGroupAdmin)
-	@Mutation(returns => GroupDetails, { name: 'AddUserToGroup'})
-	async addUser(@Args('userId') userId: number, @Context() ctx) {
+	@Mutation((returns) => GroupDetails, { name: 'AddUserToGroup'})
+	public async addUser(@Args('userId') userId: number, @Context() ctx) {
 		const groupId = ctx.req.headers['group-id'];
 		const requiredGroup = await this.groupService.addUserToGroup(userId, parseInt(groupId));
 
@@ -64,8 +63,8 @@ export class GroupDetailsResolver {
 	}
 
 	@UseGuards(AuthenticateUser)
-	@Mutation(returns => GroupOverview, {name: 'LeaveGroup'})
-	async leaveGroup(@Args('groupId') groupId: number, @Context() ctx) {
+	@Mutation((returns) => GroupOverview, {name: 'LeaveGroup'})
+	public async leaveGroup(@Args('groupId') groupId: number, @Context() ctx) {
 		const userId = ctx.req.headers['user-id'];
 		const requiredGroup = await this.groupService.leaveGroup(parseInt(userId), groupId);
 
@@ -77,8 +76,8 @@ export class GroupDetailsResolver {
 	}
 
 	@UseGuards(AuthenticateUser)
-	@Query(returns => GroupDetails, { name: 'GetGroupDetail' })
-	async getGroupDetail(@Args('groupId') groupId: number) {
+	@Query((returns) => GroupDetails, { name: 'GetGroupDetail' })
+	public async getGroupDetail(@Args('groupId') groupId: number) {
 		const requiredGroup = await this.groupService.getGroupDetails(groupId);
 
 		if (!requiredGroup) {
@@ -90,8 +89,8 @@ export class GroupDetailsResolver {
 
 	@UseGuards(AuthenticateUser)
 	@UseGuards(AuthenticateGroupAdmin)
-	@Mutation(returns => GroupOverview, { name: 'DeleteGroup' })
-	async deleteGroup(@Args('groupId') groupId: number) {
+	@Mutation((returns) => GroupOverview, { name: 'DeleteGroup' })
+	public async deleteGroup(@Args('groupId') groupId: number) {
 		const requiredGroup = await this.groupService.deleteGroup(groupId);
 
 		if (!requiredGroup) {
@@ -101,4 +100,3 @@ export class GroupDetailsResolver {
 		return requiredGroup;
 	}
 }
-

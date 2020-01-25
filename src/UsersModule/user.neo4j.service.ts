@@ -1,16 +1,15 @@
-import { Injectable, Inject } from "@nestjs/common";
+import { Injectable, Inject } from '@nestjs/common';
 import { Neo4jService } from '../Neo4j/neo4j.service';
-import { UserSignUpInput } from "./GraphqlEntites/user.signup.input";
-import { UserLoginByUsername, UserLoginByPhone } from "./GraphqlEntites/user.login.input";
+import { UserSignUpInput } from './GraphqlEntites/user.signup.input';
+import { UserLoginByUsername, UserLoginByPhone } from './GraphqlEntites/user.login.input';
 import { AuthTokenService } from '../AuthenticationModule/authentication.token.service';
 
-
-interface User {
+interface IUser {
 	id: number;
 	username: string;
 	name: string;
 	phone: string;
-};
+}
 
 @Injectable()
 export class UserNeo4jService {
@@ -18,19 +17,19 @@ export class UserNeo4jService {
 		@Inject(Neo4jService)
 		private readonly neo4j: Neo4jService,
 		@Inject(AuthTokenService)
-		private readonly authTokenService: AuthTokenService
+		private readonly authTokenService: AuthTokenService,
 	) {}
 
-	userProperties (requiredUser: any): User {
+	public userProperties(requiredUser: any): IUser {
 		return {
 			id: requiredUser.identity.toNumber(),
 			username: requiredUser.properties.username,
 			phone: requiredUser.properties.phone,
-			name: requiredUser.properties.name
+			name: requiredUser.properties.name,
 		};
 	}
 
-	async getAllUsers(): Promise<any[]> {
+	public async getAllUsers(): Promise<any[]> {
 
 		const queryToExecute = `
 		MATCH (n: User)
@@ -38,37 +37,37 @@ export class UserNeo4jService {
 
 		const queryResult = await this.neo4j.executeQuery(queryToExecute);
 
-		return queryResult.map(record => {
+		return queryResult.map((record) => {
 			const requiredUser = record._fields[0];
 			return this.userProperties(requiredUser);
 		});
 	}
 
-	async checkDuplicateUsername(username: string): Promise<any> {
+	public async checkDuplicateUsername(username: string): Promise<any> {
 		const queryToExecute = `
 		MATCH (n: User)
 		WHERE n.username = $username
 		RETURN n`;
 
 		const params = {
-			username: username.toLowerCase()
+			username: username.toLowerCase(),
 		};
 
 		const result = await this.neo4j.executeQuery(queryToExecute, params);
 
 		if (result.length) {
-			throw new Error('Username registered to different user')
+			throw new Error('Username registered to different user');
 		}
 	}
 
-	async checkDuplicatePhone(phone: string): Promise<any> {
+	public async checkDuplicatePhone(phone: string): Promise<any> {
 		const queryToExecute = `
 		MATCH (n: User)
 		WHERE n.phone = $phone
 		RETURN n`;
 
 		const params = {
-			phone
+			phone,
 		};
 
 		const result = await this.neo4j.executeQuery(queryToExecute, params);
@@ -78,7 +77,7 @@ export class UserNeo4jService {
 		}
 	}
 
-	async createNewUser(signUpData: UserSignUpInput): Promise<any> {
+	public async createNewUser(signUpData: UserSignUpInput): Promise<any> {
 
 		await this.checkDuplicatePhone(signUpData.phone);
 		await this.checkDuplicateUsername(signUpData.username);
@@ -98,21 +97,21 @@ export class UserNeo4jService {
 			username: signUpData.username.toLowerCase(),
 			name: signUpData.name,
 			phone: signUpData.phone,
-			password: signUpData.password
+			password: signUpData.password,
 		});
 
 		const requiredUser = queryResult[0]._fields[0];
 		return this.userProperties(requiredUser);
 	}
 
-	async findOneByPhone(phone: string): Promise<any> {
+	public async findOneByPhone(phone: string): Promise<any> {
 		const queryToExecute = `
 		MATCH (n: User)
 		WHERE n.phone = $phone
 		RETURN n`;
 
 		const queryResult = await this.neo4j.executeQuery(queryToExecute, {
-			phone: phone
+			phone,
 		});
 
 		if (queryResult.length) {
@@ -123,7 +122,7 @@ export class UserNeo4jService {
 		}
 	}
 
-	async findOneByUsername(username: string): Promise<any> {
+	public async findOneByUsername(username: string): Promise<any> {
 
 		const queryToExecute = `
 		MATCH (n: User)
@@ -131,7 +130,7 @@ export class UserNeo4jService {
 		RETURN n`;
 
 		const queryResult = await this.neo4j.executeQuery(queryToExecute, {
-			username: username.toLowerCase()
+			username: username.toLowerCase(),
 		});
 
 		if (queryResult.length) {
@@ -142,7 +141,7 @@ export class UserNeo4jService {
 		}
 	}
 
-	async checkUserLoginByUsername(userLoginDto: UserLoginByUsername): Promise<any> {
+	public async checkUserLoginByUsername(userLoginDto: UserLoginByUsername): Promise<any> {
 		const requiredUser = await this.findOneByUsername(userLoginDto.username);
 
 		if (!requiredUser) {
@@ -153,12 +152,12 @@ export class UserNeo4jService {
 			throw new Error('Invalid password');
 		}
 
-		//Update auth token here
+		// Update auth token here
 		const authToken = await this.authTokenService.createNewToken(requiredUser.id);
 		return { ...requiredUser, auth_token: authToken };
 	}
 
-	async checkUserLoginByPhone(userLoginDto: UserLoginByPhone): Promise<any> {
+	public async checkUserLoginByPhone(userLoginDto: UserLoginByPhone): Promise<any> {
 		const requiredUser = await this.findOneByPhone(userLoginDto.phone);
 
 		if (!requiredUser) {
@@ -169,13 +168,14 @@ export class UserNeo4jService {
 			throw new Error('Invalid password');
 		}
 
-		//Update auth token here
+		// Update auth token here
 		const authToken = await this.authTokenService.createNewToken(requiredUser.id);
 		return { ...requiredUser, auth_token: authToken };
 	}
 
-	async findUser (username?: string, name?: string, phone?: string) {
-		const where: any = [], queryParams : any = {};
+	public async findUser(username?: string, name?: string, phone?: string) {
+
+		const where: any = [], queryParams: any = {};
 		const queryAlias: string = 'user';
 
 		if (username) {
@@ -196,14 +196,14 @@ export class UserNeo4jService {
 		let query = `MATCH (${queryAlias}: User)`;
 
 		if (where.length) {
-			query+= `\nWHERE ${where.join(' AND ')}`;
+			query += `\nWHERE ${where.join(' AND ')}`;
 		}
-		
-		query+= `\nRETURN ${queryAlias}`;
+
+		query += `\nRETURN ${queryAlias}`;
 
 		const queryResult = await this.neo4j.executeQuery(query, queryParams);
 
-		return queryResult.map(record => {
+		return queryResult.map((record) => {
 			const requiredUser = record._fields[0];
 			return this.userProperties(requiredUser);
 		});

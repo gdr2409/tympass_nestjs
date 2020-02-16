@@ -26,11 +26,8 @@ lerna-debug.log*
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
 ./*/*.json
+
+.vscode/
+src/firestore-security-key.js
+package-lock.json

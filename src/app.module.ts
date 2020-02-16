@@ -11,19 +11,21 @@ import { UserModule } from './UsersModule/user.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Neo4jModule } from './Neo4j/neo4j.module';
 import { UserGroupModule } from './UserGroupModule/user.group.module';
+import { CacheModule } from './CacheModule/cache.module';
+import { RedisService } from './CacheModule/cache.service';
 
 @Module({
   imports: [TypeOrmModule.forRootAsync({
 		imports: [ConfigModule],
 		useFactory: async (configService: ConfigService) => ({
 			type: 'postgres' as 'postgres',
-			host: configService.getHost(),
-			port: configService.getPort(),
-			database: configService.getDatabase(),
-			password: configService.getPassword(),
-			username: configService.getUsername(),
+			host: await configService.getHost(),
+			port: await configService.getPort(),
+			database: await configService.getDatabase(),
+			password: await configService.getPassword(),
+			username: await configService.getUsername(),
 			entities: [UserData],
-			synchronize: true,
+			synchronize: false,
 		}),
 		inject: [ConfigService],
 	}),
@@ -34,8 +36,10 @@ import { UserGroupModule } from './UserGroupModule/user.group.module';
 	UserGroupModule,
 	UserModule,
 	Neo4jModule,
+	CacheModule,
+	ConfigModule,
   ],
   controllers: [AppController, UserController],
-  providers: [AppService, UserService],
+  providers: [AppService, UserService, RedisService],
 })
 export class AppModule {}

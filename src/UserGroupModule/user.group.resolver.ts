@@ -1,5 +1,5 @@
 import { Resolver, Query, Args, Mutation, Context } from '@nestjs/graphql';
-import { UseGuards, InternalServerErrorException } from '@nestjs/common';
+import { UseGuards, InternalServerErrorException, UseInterceptors } from '@nestjs/common';
 
 import { GroupOverview } from './outputs/group.overview';
 import { GroupDetails } from './outputs/group.details';
@@ -8,6 +8,7 @@ import { CreateGroupInput } from './inputs/group.create.input';
 import { EditGroupInput } from './inputs/group.edit.input';
 import { AuthenticateUser } from '../AuthenticationModule/user.authenticate';
 import { AuthenticateGroupAdmin } from '../AuthenticationModule/group.admin.authenticate';
+import { GroupDetailsCachingInterceptor } from '../CacheModule/Interceptors/group.details.interceptor';
 
 @Resolver ()
 export class GroupDetailsResolver {
@@ -76,6 +77,7 @@ export class GroupDetailsResolver {
 	}
 
 	@UseGuards(AuthenticateUser)
+	@UseInterceptors(GroupDetailsCachingInterceptor)
 	@Query((returns) => GroupDetails, { name: 'GetGroupDetail' })
 	public async getGroupDetail(@Args('groupId') groupId: number) {
 		const requiredGroup = await this.groupService.getGroupDetails(groupId);

@@ -13,3 +13,4 @@ async function bootstrap() {
   await app.listen(3002, '0.0.0.0');
 }
 bootstrap();
+console.log('Server up and running');

@@ -1,37 +1,83 @@
 import { Injectable } from '@nestjs/common';
 
+import { configDB } from './config.provider';
+
+// const config = require('../config.json');
+
 @Injectable()
 export class ConfigService {
-
-	public pgConfig = {
-		host: 'localhost',
-		port: 5434,
-		username: 'superadmin',
-		password: 'tympass',
-		database: 'template1',
-	};
+	private static pgConfig: any;
 
 	public getPostgresConfig(): any {
-		return this.pgConfig;
+		return ConfigService.pgConfig;
 	}
 
-	public getHost(): string {
-		return this.pgConfig.host || 'localhost';
+	public async getHost(): Promise<string> {
+		if (!ConfigService.pgConfig) {
+			await this.pgConfigInitializer();
+		}
+		return ConfigService.pgConfig.host;
 	}
 
-	public getPort(): number {
-		return this.pgConfig.port || 5434;
+	public async getPort(): Promise<number> {
+		if (!ConfigService.pgConfig) {
+			await this.pgConfigInitializer();
+		}
+		return ConfigService.pgConfig.port;
 	}
 
-	public getUsername(): string {
-		return this.pgConfig.username || 'superadmin';
+	public async getUsername(): Promise<string> {
+		if (!ConfigService.pgConfig) {
+			await this.pgConfigInitializer();
+		}
+		return ConfigService.pgConfig.username;
 	}
 
-	public getPassword(): string {
-		return this.pgConfig.password || 'tympass';
+	public async getPassword(): Promise<string> {
+		if (!ConfigService.pgConfig) {
+			await this.pgConfigInitializer();
+		}
+		return ConfigService.pgConfig.password;
 	}
 
-	public getDatabase(): string {
-		return this.pgConfig.database || 'tympass';
+	public async getDatabase(): Promise<string> {
+		if (!ConfigService.pgConfig) {
+			await this.pgConfigInitializer();
+		}
+		return ConfigService.pgConfig.database;
+	}
+
+	public getRedisConfig (): object {
+		return {
+			redis: {
+				port: 6379,
+				host: '127.0.0.1',
+			},
+		};
+	}
+
+	private async pgConfigInitializer () {
+		await new Promise ((resolve, reject) => {
+			configDB.collection('config').doc('postgresConfig').get()
+			.then((doc) => {
+				if (!doc) {
+					reject('No postgres config found');
+				} else {
+					ConfigService.pgConfig = doc.data();
+					console.log(JSON.stringify(ConfigService.pgConfig));
+					this.pgConfigObserver();
+					resolve();
+				}
+			});
+		});
+	}
+
+	private pgConfigObserver () {
+		configDB.collection('config').doc('postgresConfig').onSnapshot((doc) => {
+			ConfigService.pgConfig = doc.data();
+			console.log('Observer: ' + JSON.stringify(ConfigService.pgConfig));
+		}, (err) => {
+			console.log(`Error while observing ${err}`);
+		});
 	}
 }
